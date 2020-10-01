@@ -171,7 +171,7 @@ Python first appeared in 1990: 20--25~years before we adopted it
 \begin{itemize}
 \item \textcolor{darkblue}{Python, R, Ruby, Javascript, Lua, etc.} are all relatively abstract, late error-catching glue languages. \\ \uncover<2->{\textcolor{darkblue}{Python isn't special:} it's just where the best libraries self-gravitated.}
 
-\item<3-> \textcolor{darkblue}{Julia} is different: everything just-in-time compiles, so it is just as dynamic, but it can be fast, too.
+\item<3-> \textcolor{darkblue}{Julia} is different: everything is ``just-in-time'' (JIT) compiled, so it is flexible like Python, but fast, too.
 
 \item<4-> \textcolor{darkblue}{Rust} is a unique extreme. Triggers?
 
@@ -214,7 +214,7 @@ Python first appeared in 1990: 20--25~years before we adopted it
 \end{center}
 \end{frame}
 
-\begin{frame}[fragile]{It's not the language, it's what you do with it that matters!}
+\begin{frame}[fragile]{Language choice does not determine performance!}
 \vspace{0.25 cm}
 \hfill\mbox{\includegraphics[height=3 cm]{img/performance-test-fractal.png}\hspace{-0.25 cm}}
 
@@ -269,11 +269,11 @@ def run(height, width, maxiterations=20):
 \large
 \vspace{0.25 cm}
 \begin{center}
-\uncover<2->{Now \textcolor{darkorange}{\bf 50$\times$ faster}, about equal to C code ({\tt -O3}).}
+\uncover<2->{Now \textcolor{darkorange}{\bf 50$\times$ faster}, about as fast as C code ({\tt -O3}).}
 \end{center}
 \end{frame}
 
-\begin{frame}{Numba statically analyzes Python and compiles it with LLVM}
+\begin{frame}{\textcolor{yellow}{Numba} statically analyzes Python and compiles it with LLVM}
 \vspace{0.35 cm}
 
 \begin{center}
@@ -281,7 +281,7 @@ def run(height, width, maxiterations=20):
 \end{center}
 \end{frame}
 
-\begin{frame}[fragile]{Here's the catch: \uncover<2>{the right is legal Python, but dynamically typed}}
+\begin{frame}[fragile]{Here's the catch: \uncover<2>{\textcolor{yellow}{the right is legal Python, but dynamically typed}}}
 \vspace{-0.6 cm}
 \begin{columns}[t]
 \column{0.45\linewidth}
@@ -349,11 +349,97 @@ Cannot unify Literal[str](hello) and
 \end{columns}
 \end{frame}
 
-\begin{frame}{PyPy JIT-compiles {\it all} of Python; Julia defines less dynamism}
+\begin{frame}{\textcolor{yellow}{PyPy} JIT-compiles {\it all} of Python; \textcolor{yellow}{Julia} defines less dynamism}
 \vspace{0.05 cm}
 \begin{center}
 \includegraphics[width=0.91\linewidth]{img/pypy-and-julia.png}
 \end{center}
+\end{frame}
+
+\begin{frame}{Defining less is good: \textcolor{yellow}{ROOT's RDataFrame} takes away for loops}
+\vspace{0.25 cm}
+
+\begin{center}
+\includegraphics[width=\linewidth]{img/rdataframe-graph.png}
+\end{center}
+
+\begin{uncoverenv}<2->
+\fbox{\begin{minipage}{\linewidth}
+Without an explicit \mintinline{python}{for} loop, tasks without a dependency arrow can be parallelized or distributed across a cluster.
+\end{minipage}}
+\end{uncoverenv}
+
+\vspace{0.25 cm}
+(see Enrico Guiraud @ CHEP 2018)
+\end{frame}
+
+\begin{frame}{}
+\begin{columns}
+\column{1.15\linewidth}
+\includegraphics[width=\linewidth]{img/rdataframe-slide-1.png}
+\end{columns}
+\end{frame}
+
+\begin{frame}{}
+\begin{columns}
+\column{1.15\linewidth}
+\includegraphics[width=\linewidth]{img/rdataframe-slide-2.png}
+\end{columns}
+\end{frame}
+
+\begin{frame}{}
+\begin{columns}
+\column{1.15\linewidth}
+\includegraphics[width=\linewidth]{img/rdataframe-distributed.png}
+\end{columns}
+\end{frame}
+
+\begin{frame}{RDataFrame also JIT-compiles functions (with Cling)}
+\vspace{0.5 cm}
+
+\begin{center}
+\includegraphics[width=0.7\linewidth]{img/rdataframe-jit.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{}
+
+\end{frame}
+
+\begin{frame}[fragile]{Exactly one level of abstraction: \textcolor{yellow}{events}}
+\vspace{0.25 cm}
+\textcolor{darkblue}{Events are distributed, but event code is C++ on \mbox{\mintinline{c++}{ROOT::VecOps::RVec<Particle>}.\hspace{-1 cm}}}
+
+\scriptsize
+\vspace{0.2 cm}
+\begin{minted}{python}
+getPt_code = """
+using namespace ROOT::VecOps;
+RVec<double> getPt(const RVec<FourVector> &tracks) {
+   auto pt = [](const FourVector &v) { return v.pt(); };
+   return Map(tracks, pt);
+}
+"""
+ROOT.gInterpreter.Declare(getPt_code)
+\end{minted}
+\vspace{0.1 cm}
+\begin{minted}{python}
+getPtWeights_code = """
+using namespace ROOT::VecOps;
+RVec<double> getPtWeights(const RVec<FourVector> &tracks) {
+   auto ptWeight = [](const FourVector &v) { return 1. / v.Pt(); };
+   return Map(tracks, ptWeight);
+};
+"""
+ROOT.gInterpreter.Declare(getPtWeights_code)
+\end{minted}
+\vspace{0.1 cm}
+\begin{minted}{python}
+augmented_d = (d.Define("tracks_n", "(int)tracks.size()")
+                .Filter("tracks_n > 2")
+                .Define("tracks_pts", "getPt(tracks)")
+                .Define("tracks_pts_weights", "getPtWeights(tracks)"))
+\end{minted}
 \end{frame}
 
 \begin{frame}{\mbox{ }}
