@@ -676,7 +676,65 @@ augmented_d = (d.Define("tracks_n", "(int)tracks.size()")
 \end{minted}
 \end{frame}
 
+\begin{frame}[fragile]{\textcolor{yellow}{Awkward Arrays} can be used with \textcolor{yellow}{Numba}}
+\vspace{0.2 cm}
+You can mix fast, explicit \mintinline{python}{for} loops with NumPy-like slicing, all in Python.
 
+\vspace{0.25 cm}
+\scriptsize
+\begin{minted}{python}
+>>> @nb.jit
+... def make_cut(electrons, jets, builder):
+...     for event_electrons, event_jets in zip(electrons, jets):
+...         builder.begin_list()
+...         for electron in event_electrons:
+...             keep = False
+...             for jet in event_jets:
+...                 if abs(electron.x - jet.x) < 0.45:   # calculate delta-R here
+...                     keep = True
+...                     break
+...             builder.append(keep)
+...         builder.end_list()
+...     return builder
+... 
+>>> cut = make_cut(electrons, jets, ak.ArrayBuilder()).snapshot()
+>>> cut
+<Array [[True, False, True], ... [True, False]] type='3 * var * bool'>
+>>> electrons[cut].tolist()
+[[{'x': 1, 'y': 1, 'z': 1, 't': 1}, {'x': 3, 'y': 3, 'z': 3, 't': 3}],
+ [],
+ [{'x': 4, 'y': 4, 'z': 4, 't': 4}]]
+\end{minted}
+\end{frame}
+
+\begin{frame}{\textcolor{yellow}{vector}: an Awkward 2D, 3D, Lorentz vector library in development}
+\vspace{0.17 cm}
+\begin{columns}
+\column{1.04\linewidth}
+\includegraphics[width=\linewidth]{img/vector-github.png}
+\end{columns}
+\end{frame}
+
+\begin{frame}{First release of \textcolor{yellow}{hist}, a Pythonic histogram library, on Tuesday}
+\vspace{0.18 cm}
+\begin{center}
+\includegraphics[width=0.85\linewidth]{img/hist-plots.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{\textcolor{yellow}{hepunits}: common units in HEP and \textcolor{yellow}{particle}: PDG data}
+\vspace{0.18 cm}
+\begin{center}
+\includegraphics[width=0.85\linewidth]{img/hepunits-particle.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{\textcolor{yellow}{Scikit-HEP}: a growing ecosystem of interoperating tools}
+\vspace{0.15 cm}
+\begin{center}
+\includegraphics[width=0.85\linewidth]{img/ecosystem.pdf}
+\end{center}
+\end{frame}
 
 \begin{frame}{\mbox{ }}
 \vspace{0.5 cm}
