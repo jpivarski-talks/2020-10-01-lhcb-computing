@@ -58,7 +58,7 @@
 
 \begin{frame}{Define: ``user analysis''}
 \large
-\vspace{0.5 cm}
+\vspace{0.65 cm}
 
 I'm aware that LHCb is moving important physics decisions earlier in the pipeline, but I think it's still meaningful to talk about ``user analysis'' as the last step.
 
@@ -77,7 +77,7 @@ I'm aware that LHCb is moving important physics decisions earlier in the pipelin
 
 \begin{frame}{Python: the revolution has already happened}
 \large
-\vspace{0.35 cm}
+\vspace{0.5 cm}
 
 Plot \#1: pip-install statistics in the past three years
 
@@ -91,7 +91,7 @@ Plot \#1: pip-install statistics in the past three years
 
 \begin{frame}{Python: the revolution has already happened}
 \large
-\vspace{0.35 cm}
+\vspace{0.5 cm}
 
 Plot \#2: Language of non-fork GitHub repos by users who forked CMSSW
 
@@ -105,7 +105,7 @@ Plot \#2: Language of non-fork GitHub repos by users who forked CMSSW
 
 \begin{frame}{Python: the revolution has already happened}
 \large
-\vspace{0.35 cm}
+\vspace{0.5 cm}
 
 Plot \#3: Search for substrings in those repos: what are those users typing?
 
@@ -119,7 +119,7 @@ Plot \#3: Search for substrings in those repos: what are those users typing?
 
 \begin{frame}{Python: the revolution has already happened}
 \large
-\vspace{0.35 cm}
+\vspace{0.5 cm}
 
 Plot \#3: What about machine learning?
 
@@ -133,7 +133,7 @@ Plot \#3: What about machine learning?
 
 \begin{frame}{Python: the revolution has already happened}
 \large
-\vspace{0.35 cm}
+\vspace{0.5 cm}
 
 Plot \#4: Was Python adoption driven by Uproot or machine learning (ML)?
 
@@ -162,7 +162,7 @@ Python first appeared in 1990: 20--25~years before we adopted it
 \end{frame}
 
 \begin{frame}{An aside on future languages}
-\vspace{0.25 cm}
+\vspace{0.5 cm}
 \begin{columns}
 \column{0.5\linewidth}
 \includegraphics[width=\linewidth]{img/language-properties-grid.pdf}
@@ -211,6 +211,148 @@ Python first appeared in 1990: 20--25~years before we adopted it
 
 \begin{center}
 \includegraphics[width=0.9\linewidth]{img/topics-2.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{It's not the language, it's what you do with it that matters!}
+\vspace{0.25 cm}
+\hfill\mbox{\includegraphics[height=3 cm]{img/performance-test-fractal.png}\hspace{-0.25 cm}}
+
+\vspace{-2.5 cm}
+\scriptsize
+\begin{columns}
+\column{1.08\linewidth}
+\begin{onlyenv}<1>
+\begin{minted}{python}
+import numpy
+
+def run(height, width, maxiterations=20):
+    y, x = numpy.ogrid[-1:0:height*1j, -1.5:0:width*1j]
+    c = x + y*1j
+    fractal = numpy.full(c.shape, maxiterations,
+                                  dtype=numpy.int32)
+    for h in range(height):
+        for w in range(width):                  # for each pixel (h, w)...
+            z = c[h, w]
+            for i in range(maxiterations):      # iterate at most 20 times
+                z = z**2 + c[h, w]              # applying z → z² + c
+                if abs(z) > 2:                  # if it diverges (|z| > 2)
+                    fractal[h, w] = i           # color the plane with the iteration number
+                    break                       # we're done, no need to keep iterating
+
+    return fractal
+\end{minted}
+\end{onlyenv}
+\begin{onlyenv}<2>
+\begin{minted}{python}
+import numpy, numba
+@numba.jit
+def run(height, width, maxiterations=20):
+    y, x = numpy.ogrid[-1:0:height*1j, -1.5:0:width*1j]
+    c = x + y*1j
+    fractal = numpy.full(c.shape, maxiterations,
+                                  dtype=numpy.int32)
+    for h in range(height):
+        for w in range(width):                  # for each pixel (h, w)...
+            z = c[h, w]
+            for i in range(maxiterations):      # iterate at most 20 times
+                z = z**2 + c[h, w]              # applying z → z² + c
+                if abs(z) > 2:                  # if it diverges (|z| > 2)
+                    fractal[h, w] = i           # color the plane with the iteration number
+                    break                       # we're done, no need to keep iterating
+
+    return fractal
+\end{minted}
+\end{onlyenv}
+\end{columns}
+
+\large
+\vspace{0.25 cm}
+\begin{center}
+\uncover<2->{Now \textcolor{darkorange}{\bf 50$\times$ faster}, about equal to C code ({\tt -O3}).}
+\end{center}
+\end{frame}
+
+\begin{frame}{Numba statically analyzes Python and compiles it with LLVM}
+\vspace{0.35 cm}
+
+\begin{center}
+\includegraphics[width=\linewidth]{img/numba-website.png}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Here's the catch: \uncover<2>{the right is legal Python, but dynamically typed}}
+\vspace{-0.6 cm}
+\begin{columns}[t]
+\column{0.45\linewidth}
+\Large
+\begin{center}
+\textcolor{darkblue}{GOOD}
+\end{center}
+
+\vspace{-0.3 cm}
+\scriptsize
+\begin{minted}{python}
+>>> @nb.njit
+... def monte_carlo_pi(nsamples):
+...     total = 0
+...     for i in range(nsamples):
+...         x = random.random()
+...         y = random.random()
+...         if x**2 + y**2 < 1:
+...             total += 1
+...     return 4.0 * total / nsamples
+... 
+>>> monte_carlo_pi(int(1e9))
+3.14156838
+\end{minted}
+
+\column{0.55\linewidth}
+\Large
+\begin{center}
+\textcolor{darkblue}{BAD}
+\end{center}
+
+\vspace{-0.3 cm}
+\scriptsize
+\begin{minted}{python}
+>>> @nb.njit
+... def monte_carlo_pi(nsamples):
+...     total = "hello"
+...     for i in range(nsamples):
+...         if total == "hello":
+...             total = 0
+...         x = random.random()
+...         y = random.random()
+...         if x**2 + y**2 < 1:
+...             total += 1
+...     return 4.0 * total / nsamples
+... 
+>>> monte_carlo_pi(int(1e9))
+\end{minted}
+\vspace{-0.3 cm}
+\begin{verbatim}
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+\end{verbatim}
+\vspace{-0.5 cm}
+\begin{verbatim}
+... (big traceback) ...
+\end{verbatim}
+\vspace{-0.5 cm}
+\begin{verbatim}
+Cannot unify Literal[str](hello) and
+    Literal[int](0) for 'total.5',
+    defined at <stdin> (4)
+\end{verbatim}
+\vspace{0.5 cm}
+\end{columns}
+\end{frame}
+
+\begin{frame}{PyPy JIT-compiles {\it all} of Python; Julia defines less dynamism}
+\vspace{0.05 cm}
+\begin{center}
+\includegraphics[width=0.91\linewidth]{img/pypy-and-julia.png}
 \end{center}
 \end{frame}
 
