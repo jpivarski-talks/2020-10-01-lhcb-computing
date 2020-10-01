@@ -606,6 +606,78 @@ augmented_d = (d.Define("tracks_n", "(int)tracks.size()")
 \end{columns}
 \end{frame}
 
+\begin{frame}[fragile]{Like NumPy, but structured: \textcolor{yellow}{broadcasting}}
+\begin{center}
+\includegraphics[width=0.4\linewidth]{img/cartoon-broadcasting.pdf}
+\end{center}
+
+\begin{columns}
+\column{1.03\linewidth}
+\begin{minted}{python}
+>>> jagged = ak.Array([[1, 2, 3],  [], [4, 5]])
+>>> flat   = ak.Array([      100, 200,    300])
+>>> jagged + flat
+<Array [[101, 102, 103], [], [304, 305]] type='3 * var * int64'>
+\end{minted}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Like NumPy, but structured: \textcolor{yellow}{combinatorics}}
+\scriptsize
+\vspace{0.5 cm}
+
+\begin{columns}
+\column{0.5\linewidth}
+\textcolor{darkblue}{\Large Cartesian product}
+
+\includegraphics[width=\linewidth]{img/cartoon-cartesian.pdf}
+
+\begin{minted}{python}
+>>> x = [[1, 2, 3], [], [4]]
+>>> y = [["a", "b"], ["c"], ["d", "e"]]
+>>> ak.cartesian([x, y], axis=1)
+[[(1, "a"), (1, "b"),
+  (2, "a"), (2, "b"),
+  (3, "a"), (3, "b")],
+ [],
+ [(4, "d"), (4, "e")]]
+\end{minted}
+
+\column{0.52\linewidth}
+\textcolor{darkblue}{\Large Combinations without replacement}
+
+\includegraphics[width=\linewidth]{img/cartoon-combinations.pdf}
+
+\begin{minted}{python}
+>>> x = [[1, 2, 3, 4], [], [5, 6]]
+>>> ak.combinations(x, 2, axis=1)
+[[(1, 2), (1, 3), (1, 4),
+  (2, 3), (2, 4), (3, 4)],
+ [],
+ [(5, 6)]]
+\end{minted}
+\vspace{\baselineskip}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Like NumPy, but structured: \textcolor{yellow}{reduction}}
+\vspace{0.5 cm}
+
+\includegraphics[width=8 cm]{img/reduction.pdf}
+
+\begin{minted}{python}
+>>> ak.prod(array, axis=0)
+<Array [22, 21, 5] type='3 * int64'>
+\end{minted}
+
+\begin{minted}{python}
+>>> ak.prod(array, axis=1)
+<Array [30, 1, 7, 11] type='4 * int64'>
+\end{minted}
+\end{frame}
+
+
+
 \begin{frame}{\mbox{ }}
 \vspace{0.5 cm}
 
