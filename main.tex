@@ -744,6 +744,37 @@ You can mix fast, explicit \mintinline{python}{for} loops with NumPy-like slicin
 \end{center}
 \end{frame}
 
+\begin{frame}[fragile]{A \textcolor{yellow}{columnar} form can be iterated or vectorized}
+\small
+
+\begin{Verbatim}[commandchars=\\\{\}]
+array = ak.Array([
+    \textcolor{red}{[}\{\textcolor{darkgray}{"x"}: \textcolor{darkgreen}{1},  \textcolor{darkgray}{"y"}: \textcolor{blue}{[}\textcolor{darkorange}{11}\textcolor{blue}{]}\},
+     \{\textcolor{darkgray}{"x"}: \textcolor{darkgreen}{4},  \textcolor{darkgray}{"y"}: \textcolor{blue}{[}\textcolor{darkorange}{12, 22}\textcolor{blue}{]}\},
+     \{\textcolor{darkgray}{"x"}: \textcolor{darkgreen}{9},  \textcolor{darkgray}{"y"}: \textcolor{blue}{[}\textcolor{darkorange}{13, 23, 33}\textcolor{blue}{]}\}\textcolor{red}{]},
+    \textcolor{red}{[]},
+    \textcolor{red}{[}\{\textcolor{darkgray}{"x"}: \textcolor{darkgreen}{16}, \textcolor{darkgray}{"y"}: \textcolor{blue}{[}\textcolor{darkorange}{14, 24, 34, 44}\textcolor{blue}{]}\}\textcolor{red}{]}
+])
+\end{Verbatim}
+
+\begin{Verbatim}[commandchars=\\\{\}]
+outer offsets:  \textcolor{red}{0,                     3,  3, 5}
+content for x:  \textcolor{darkgreen}{1,  4,      9,            16}
+offsets for y:  \textcolor{blue}{0,  1,      3,             6,            10}
+content for y: \textcolor{darkorange}{11, 12, 22, 13, 23, 33,    14, 24, 34, 44}
+\end{Verbatim}
+
+\mbox{ } \hfill \includegraphics[width=0.9\linewidth]{img/example-hierarchy.pdf} \hfill \mbox{ }
+\end{frame}
+
+\begin{frame}{Columnar data formats in industry: \textcolor{yellow}{on disk}, \textcolor{yellow}{in memory}, \textcolor{yellow}{on GPUs}}
+\vspace{0.2 cm}
+\begin{columns}
+\column{1.13\linewidth}
+\includegraphics[width=\linewidth]{img/three-columnar-websites.png}
+\end{columns}
+\end{frame}
+
 \begin{frame}{\mbox{ }}
 \vspace{0.5 cm}
 
