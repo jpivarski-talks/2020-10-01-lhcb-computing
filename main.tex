@@ -768,7 +768,7 @@ content for y: \textcolor{darkorange}{11, 12, 22, 13, 23, 33,    14, 24, 34, 44}
 \mbox{ } \hfill \includegraphics[width=0.9\linewidth]{img/example-hierarchy.pdf} \hfill \mbox{ }
 \end{frame}
 
-\begin{frame}[fragile]{\textcolor{yellow}{ROOT's TTree} is columnar to one level}
+\begin{frame}[fragile]{\textcolor{yellow}{ROOT's TTree} is columnar to one level (only intended for iteration)}
 \small
 
 \begin{Verbatim}[commandchars=\\\{\}]
@@ -857,5 +857,49 @@ The first two layers are compatible/convertible to Awkward Array.
 \end{center}
 \end{frame}
 
+\begin{frame}{Query services (mostly future)}
+\large
+\vspace{0.5 cm}
+
+As datasets get too big to ntuplize, we'll have to move the pre-aggregation steps of analysis to a centralized service.
+
+\vspace{0.5 cm}
+\begin{uncoverenv}<2->
+Need to reproduce the low-latency experience of a local ntuple on a \mbox{shared system.\hspace{-1 cm}}
+\begin{itemize}
+\item It will be harder because it will be more in demand at peak times.
+\item It will be easier because popular data can be in shared caches.
+\end{itemize}
+\end{uncoverenv}
+
+\vspace{0.5 cm}
+\uncover<3->{Strong bias toward reusing existing technologies: Kubernetes, Docker, Kafka, Spark, Dask, and perhaps Ray.}
+
+\vspace{0.5 cm}
+\begin{uncoverenv}<4->
+Query services are now at the demo stage!
+\begin{itemize}
+\item ServiceX: \textcolor{blue}{\url{https://youtu.be/NEgqGRdt360}}
+\item CoffeaCasa: \textcolor{blue}{\url{https://youtu.be/CDIFd1gDbSc}}
+\end{itemize}
+\end{uncoverenv}
+\end{frame}
+
+\begin{frame}{Conclusions}
+\large
+\vspace{0.5 cm}
+
+\begin{itemize}\setlength{\itemsep}{0.2 cm}
+\item The transition to more-Python-than-C++ has already happened.
+\item DSLs are also being explored, but they're at a much earlier stage.
+\item Just-in-time compilation is important: Numba, PyPy, Julia, \mbox{and RDataFrame.\hspace{-1 cm}}
+\item So is ``removing the \mintinline{python}{for} loop.''
+\item Awkward Array has implicit loops at all levels for NumPy-like manipulation, and also provides an onramp into Numba for conventional code.
+\item The Scikit-HEP ecosystem is booming!
+\item Columnar internal structures are essential: ROOT is developing RNTuple.
+\item Columnar data formats are popular in industry, too. We must interoperate!
+\item Query services are at the demo stage.
+\end{itemize}
+\end{frame}
 
 \end{document}
